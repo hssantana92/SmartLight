@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SmartLight.DevicePage"
+             xmlns:viewmodel="clr-namespace:SmartLight.ViewModel"
+             xmlns:converters="clr-namespace:SmartLight.Converters"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:DataType="viewmodel:DevicePageViewModel"
+             Shell.NavBarIsVisible="False"
+             xmlns:controls="https://trungnt2910.github.io/schemas/maui/2022/colorpicker"
+             BackgroundColor="WhiteSmoke"
+             Title="{Binding Device.Label}">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:PickedColorChangedEventArgsConverter x:Key="pickedColorChangedEventArgsConverter"></converters:PickedColorChangedEventArgsConverter>
+            <converters:ValueChangedEventArgsConverter x:Key="valueChangedEventArgsConverter"></converters:ValueChangedEventArgsConverter>
+            <converters:BrightnessValueConverter x:Key="brightnessValueConverter"></converters:BrightnessValueConverter>
+            <converters:OpacityValueConverter x:Key="opacityValueConverter"></converters:OpacityValueConverter>
+            <converters:HsvToColourConverter x:Key="hsvToColourConverter"></converters:HsvToColourConverter>
+            
+            
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <Grid ColumnDefinitions=".1*, .8*, .1*" RowDefinitions=".15*, .45*, .3*, .1*, .1*" Padding="20,0,20,20">
+
+        <Frame Grid.Row="0"  Grid.Column="0"  Grid.ColumnSpan="3" BackgroundColor="White"  Margin="-20, 0, -20, 0"   Padding="0" HasShadow="False"  BorderColor="#f0ebeb" CornerRadius="0" >
+            <Grid RowDefinitions="*" ColumnDefinitions="*">
+                <Label Grid.Column="1" HorizontalOptions="Center" Padding="20"  VerticalOptions="CenterAndExpand" FontFamily="LatoBold" FontSize="Title" TextColor="Black" Text="{Binding Device.Label}"></Label>
+            </Grid>
+
+        </Frame>
+
+
+        <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" RowDefinitions=".2*, .2*, .2*, .4*" ColumnDefinitions=".25*,.5*,.25*" Padding="0,20,0,0" >
+            <Label Text="Auto On" FontFamily="LatoBold" Grid.Row="0" Grid.Column="0" VerticalTextAlignment="Center"  HorizontalOptions="Center"></Label>
+
+            <Frame Grid.Row="0" Grid.Column="1" Padding="0" WidthRequest="75" VerticalOptions="Center" HorizontalOptions="Start">
+                <TimePicker x:Name="TimeOn" FontFamily="LatoBold" Time="{Binding Device.TimeOn, Mode=TwoWay}"></TimePicker>
+            </Frame>
+
+            <Label Text="Auto Off" FontFamily="LatoBold" Grid.Row="1" Grid.Column="0" VerticalTextAlignment="Center" HorizontalOptions="Center"></Label>
+
+            <Frame Grid.Row="1" Grid.Column="1" Padding="0" WidthRequest="75" VerticalOptions="Center" HorizontalOptions="Start">
+                <TimePicker x:Name="TimeOff" FontFamily="LatoBold" Time="{Binding Device.TimeOff, Mode=TwoWay}"></TimePicker>
+            </Frame>
+
+            <Button Text="Enable Timer" FontFamily="LatoBold" BackgroundColor="#e8bc65" Grid.Row="0" HeightRequest="50" Grid.Column="3" Command="{Binding TimerEnabledCommand}"></Button>
+            
+        </Grid>
+        
+        
+        <!-- Colour Picker -->
+
+        <Frame Grid.ColumnSpan="3" BorderColor="#f0ebeb" Grid.Row="2" Padding="0" Margin="0,0,0,20" HasShadow="True">
+            <Frame.Shadow>
+                <Shadow
+                    Brush="#f0ebeb"
+                    Offset="0,0"
+                    Radius="30"
+                    Opacity=".10" >
+                    
+                </Shadow>
+                
+                
+            </Frame.Shadow>
+
+
+
+            <Grid RowDefinitions=".8*, .2*" Opacity="{Binding Device.Colour, Mode=OneWay, Converter={StaticResource opacityValueConverter}}">
+
+                <controls:ColorPicker
+                    Grid.Row="0"
+                    x:Name="ColorPicker"
+                    IsEnabled="{Binding Device.Colour}"
+                    IsVisible="{Binding Device.Colour}"
+                    PickedColor="{Binding Device, Mode=OneWay, Converter={StaticResource hsvToColourConverter}}"
+                    
+                    PickedColorChanged="ColorPicker_PickedColorChanged"
+                    ColorFlowDirection="Horizontal"
+                    ColorSpectrumStyle="ShadeToHueToTintStyle"
+                    
+                    
+                    >
+                    <controls:ColorPicker.Behaviors>
+                        <toolkit:EventToCommandBehavior
+                            EventArgsConverter="{StaticResource pickedColorChangedEventArgsConverter}"
+                            
+                            EventName="PickedColorChanged"
+                            Command="{Binding ColorChangedCommand}"
+                            
+                            
+                            >
+                            
+                        </toolkit:EventToCommandBehavior>
+                    </controls:ColorPicker.Behaviors>
+                    
+                </controls:ColorPicker>
+                
+                
+                    
+                
+                
+                <Label Grid.Row="1" BackgroundColor="White" Padding="8"  Text="Colour Selector" TextColor="Black" FontFamily="LatoRegular"/>
+
+                <Line Grid.Row="1" BackgroundColor="LightGrey" WidthRequest="500" VerticalOptions="Start" HeightRequest="1" Opacity=".2"></Line>
+
+            </Grid>
+        </Frame>
+        
+        <!-- End Colour Picker Frame-->
+
+
+        <!-- Brightness Slider -->
+        <HorizontalStackLayout Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3">
+            <Image Source="brightnesssvg.svg" VerticalOptions="Start"/>
+            <Slider WidthRequest="300" Value="{Binding Device.Brightness}" VerticalOptions="Start" Minimum="0" Maximum="65535">
+                <Slider.Behaviors>
+                    <toolkit:EventToCommandBehavior
+                        EventName="ValueChanged"
+                        EventArgsConverter="{StaticResource valueChangedEventArgsConverter}"
+                    
+                    
+                        Command="{Binding BrightnessChangedCommand}"
+                    
+                    
+                        >
+                    
+                    </toolkit:EventToCommandBehavior>
+                </Slider.Behaviors>
+            </Slider>
+
+            <Label Text="{Binding Device.Brightness, Converter={StaticResource brightnessValueConverter}}"></Label>   
+        </HorizontalStackLayout>
+        
+        <!-- End Brightness Slider-->
+
+        <!-- Kelvin Slider -->
+        <HorizontalStackLayout Grid.Row="4" Grid.ColumnSpan="3">
+            <Image Source="kelvinsvg.svg" VerticalOptions="Start"></Image>
+            <Slider WidthRequest="300"  Value="{Binding Device.Kelvin}"  VerticalOptions="Start" Minimum="0" Maximum="65535">
+            <Slider.Behaviors>
+                <toolkit:EventToCommandBehavior
+                    EventName="ValueChanged"
+                    EventArgsConverter="{StaticResource valueChangedEventArgsConverter}"
+                    Command="{Binding KelvinChangedCommand}"
+                    >
+                    
+                </toolkit:EventToCommandBehavior>
+            </Slider.Behaviors>
+        </Slider>
+
+            
+        </HorizontalStackLayout>
+
+        <!--#End Kelvin Slider -->
+
+
+
+    </Grid>
+</ContentPage>

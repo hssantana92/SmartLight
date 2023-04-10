@@ -1,0 +1,256 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:model="clr-namespace:SmartLight.Models"
+             xmlns:converters="clr-namespace:SmartLight.Converters"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mct="clr-namespace:CommunityToolkit.Maui.Behaviors;assembly=CommunityToolkit.Maui"
+             x:Class="SmartLight.MainPage"
+             xmlns:viewmodel="clr-namespace:SmartLight.ViewModel"
+             x:DataType="viewmodel:DeviceViewModel"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="White"
+             x:Name="DevicePage"
+             >
+    <ContentPage.Behaviors>
+        <mct:StatusBarBehavior StatusBarColor="WhiteSmoke"></mct:StatusBarBehavior>
+    </ContentPage.Behaviors>
+
+    <ContentPage.Resources>
+        <converters:BrightnessValueConverter x:Key="brightnessValueConverter"></converters:BrightnessValueConverter>
+    </ContentPage.Resources>
+
+    <Grid BackgroundColor="WhiteSmoke">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        
+        <!-- LOGO -->
+        <Image Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,20,0,0" Source="lifxcustom.png" Aspect="AspectFit" HeightRequest="80" HorizontalOptions="Center" VerticalOptions="Center" />
+
+        <!-- /// End of Section -->
+        
+        
+        <!-- ACTIVITY INDICATOR -->
+        <ActivityIndicator
+            IsVisible="{Binding IsBusy}"
+            IsRunning="{Binding IsBusy}"
+            HorizontalOptions="FillAndExpand"
+            VerticalOptions="CenterAndExpand"
+            Grid.RowSpan="5"
+            Grid.ColumnSpan="2"
+            
+            ></ActivityIndicator>
+
+        <!-- /// End of Section -->
+
+        <!-- Buttons -->
+        <Frame  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" VerticalOptions="End" CornerRadius="10" Margin="32" BackgroundColor="White" HeightRequest="90" BorderColor="#f0ebeb">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.Shadow>
+                    <Shadow Offset="10,10" Radius="30" Opacity="0.05" />
+                </Grid.Shadow>
+                
+                <VerticalStackLayout VerticalOptions="Center" Grid.Column="0">
+                    <VerticalStackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GetDevicesCommand}"/>
+                    </VerticalStackLayout.GestureRecognizers>
+                    
+                    <Label Text="&#xf002;" FontFamily="FontAwesomeSolid" TextColor="#1e3050" FontSize="22" HorizontalOptions="Center" VerticalOptions="Center"></Label>
+                    <Label Padding="5" HorizontalOptions="Center" Text="Search" FontFamily="LatoBold" FontSize="15"></Label>
+                </VerticalStackLayout>
+
+                <VerticalStackLayout VerticalOptions="Center" Grid.Column="1">
+                    <VerticalStackLayout.GestureRecognizers>
+                        
+                    </VerticalStackLayout.GestureRecognizers>
+
+                    <Label Text="&#xe4f6;" FontFamily="FontAwesomeSolid" TextColor="#1e3050" FontSize="22" HorizontalOptions="Center" VerticalOptions="Center"></Label>
+                    <Label Padding="5" HorizontalOptions="Center" Text="Groups" FontFamily="LatoBold" FontSize="15"></Label>
+                </VerticalStackLayout>
+
+                <VerticalStackLayout VerticalOptions="Center" Grid.Column="2">
+                    <VerticalStackLayout.GestureRecognizers>
+
+                    </VerticalStackLayout.GestureRecognizers>
+
+                    <Label Text="&#xf013;" FontFamily="FontAwesomeSolid" TextColor="#1e3050" FontSize="22" HorizontalOptions="Center" VerticalOptions="Center"></Label>
+                    <Label Padding="5" HorizontalOptions="Center" Text="Settings" FontFamily="LatoBold" FontSize="15"></Label>
+                </VerticalStackLayout>
+
+                
+            </Grid>
+        </Frame>
+
+
+        <!-- /// End of Section -->
+        
+        
+        <!-- Devices Text -->
+
+
+        <StackLayout Grid.Row="2" Margin="32,0,32,15">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Label Text="Devices" Grid.Row="0" Grid.Column="0" TextColor="Black" FontSize="18" FontAttributes="None"
+                        HorizontalOptions="Start" VerticalOptions="Start" FontFamily="LatoBold" />
+
+            </Grid>
+
+        </StackLayout>
+
+        <!-- /// End of Section -->
+        
+        
+        <!-- Devices Collection View -->
+        <CollectionView Grid.Row="4" Grid.ColumnSpan="2" HorizontalOptions="FillAndExpand" HeightRequest="420" ItemsSource="{Binding Devices}" Margin="20,0,20,0" SelectionMode="Single" HorizontalScrollBarVisibility="Always" VerticalOptions="Start" BackgroundColor="Transparent">
+
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Vertical" ItemSpacing="10"/>
+            </CollectionView.ItemsLayout>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="model:Device">
+                    <Frame BackgroundColor="White" BorderColor="#f0ebeb" CornerRadius="10" Padding="10">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer 
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:DeviceViewModel}}, Path=NavigateCommand}"
+                                CommandParameter="{Binding .}"
+                                NumberOfTapsRequired="1"
+                                ></TapGestureRecognizer>
+                        </Frame.GestureRecognizers>
+
+                        
+                        <Grid ColumnSpacing="10" >
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width=".25*"/>
+                                <ColumnDefinition Width=".50*"/>
+                                <ColumnDefinition Width=".25*"/>
+                            </Grid.ColumnDefinitions>
+
+
+                            <!--<Frame Grid.Row="0" Grid.RowSpan="2" Margin="10" Padding="10"  Grid.Column="0" BackgroundColor="Transparent" HeightRequest="40" WidthRequest="40" CornerRadius="5" BorderColor="Transparent">
+                            </Frame>-->
+
+                            <Label Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Padding="8,0,8,0"  Text="&#xf0eb;" FontFamily="FontAwesomeSolid" TextColor="#e8bc65" FontSize="30" HorizontalOptions="Start" VerticalOptions="Center"></Label>
+
+                            <Label Grid.Row="0" Grid.Column="1" WidthRequest="250" VerticalOptions="Center" Text="{Binding Label}" TextColor="Black" FontFamily="LatoBold" FontSize="20"/>
+
+                            <Label Grid.Row="1" Grid.Column="1" WidthRequest="250" FontFamily="LatoRegular" Text="Brightness: " TextColor="Gray"/>
+                            <Label Grid.Row="1" Grid.Column="1" Margin="135,0,0,0" FontFamily="LatoRegular"  WidthRequest="250" TextColor="Gray" Text="{Binding Brightness, Converter={StaticResource brightnessValueConverter}}"></Label>
+
+
+                            <Switch Grid.Row="0" VerticalOptions="Start" HorizontalOptions="End" Margin="0,0,0,0" Grid.Column="2" IsToggled="{Binding Power, Mode=TwoWay}" OnColor="YellowGreen" ThumbColor="WhiteSmoke" >
+                                <Switch.Behaviors>
+                                    <toolkit:EventToCommandBehavior
+                                            EventName="Toggled"
+                                            Command="{Binding Path=BindingContext.TurnOffCommand, Source={x:Reference Name=DevicePage}}"
+                                            CommandParameter="{Binding .}">
+                                    </toolkit:EventToCommandBehavior>
+
+                                </Switch.Behaviors>
+
+                            </Switch>
+
+                            <Button Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:DeviceViewModel}}, Path=SetLabelCommand}" CommandParameter="{Binding .}"
+                                        ImageSource="editsvg.svg"
+                                        Margin="0"
+                                        VerticalOptions="Center" HorizontalOptions="End" 
+                                        TextColor="Black"
+                                        BackgroundColor="Transparent" BorderColor="Transparent" 
+                                        Grid.Column="2" Grid.Row="1"  >
+
+                            </Button>
+
+                        </Grid>
+                        
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+
+
+        <!-- /// End of Section -->
+
+
+        <!-- Bottom Nav Bar -->
+        <Frame Grid.Row="5" Padding="12" Grid.ColumnSpan="2" BorderColor="#f0ebeb" CornerRadius="0">
+            <StackLayout Margin="0" BackgroundColor="White">
+            <Grid ColumnDefinitions="*,*,*" RowDefinitions="*,*">
+
+                
+                <!-- Toggle All Lights Button -->
+                    <Frame IsEnabled="{Binding HasDevices}" Padding="0" Margin="0" Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Opacity=".25" BorderColor="Transparent">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer
+                                Command="{Binding PowerAllCommand}"
+                                >
+                            </TapGestureRecognizer>
+                        </Frame.GestureRecognizers>
+
+                        <Frame.Triggers>
+                            <Trigger TargetType="Frame"
+                                 Property="IsEnabled"
+                                 Value="True">
+
+                                <Setter Property="Opacity"
+                                    Value="1"/>
+
+                            </Trigger>
+                        </Frame.Triggers>
+                        <VerticalStackLayout>
+                            <Label Text="&#xf011;"  FontFamily="FontAwesomeSolid" TextColor="#1e3050" FontSize="22" HorizontalOptions="Center" VerticalOptions="Center"></Label>
+                            <Label Text="Toggle All" FontFamily="LatoBold" Padding="2"  HorizontalOptions="Center" ></Label>
+                        </VerticalStackLayout>
+                    </Frame>
+                
+                <!-- End of Button -->
+
+                    <Label Text="&#xf185;" Grid.Row="0" Grid.Column="1"  FontFamily="FontAwesomeSolid" TextColor="#1e3050" FontSize="22" HorizontalOptions="Center" VerticalOptions="Center"></Label>
+                    <Label Text="Brightness" Grid.Row="1" FontFamily="LatoBold" Padding="2" HorizontalOptions="Center" Grid.Column="1"></Label>
+
+                    <Label Text="&#xf53f;" Grid.Row="0" Grid.Column="2"  FontFamily="FontAwesomeSolid" TextColor="#1e3050" FontSize="22" HorizontalOptions="Center" VerticalOptions="Center"></Label>
+                    <Label Text="Colour" Grid.Row="1" FontFamily="LatoBold" Padding="2" HorizontalOptions="Center" Grid.Column="2"></Label>
+            </Grid>
+        </StackLayout>
+        </Frame>
+
+
+        <!-- /// End of Section -->
+
+
+
+
+    </Grid>
+     
+
+
+</ContentPage>
+
